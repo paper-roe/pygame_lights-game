@@ -58,35 +58,37 @@ def message_display(text1, text2='', text3='', text_size='large'):
             TextRect.center = ((display_width/2), (display_height/2+160))
             gameDisplay.blit(TextSurf, TextRect)
 
-def display_score(score):
+def display_info(score):
     score = round(score,2)
     font = pygame.font.SysFont(None, 25)
     text = font.render('Score: ' + str(score), True, blue)
-
     gameDisplay.blit(text, (display_width*0.85, display_width*0.05))
+
+    text = font.render('r to reset', True, blue)
+    gameDisplay.blit(text, (display_width*0.85, display_width*0.10))
 
 def won(score):
     score = str(round(score,2))
 
     gameDisplay.fill(green)
 
-    message_display('You are won!', 'Score: ' + score)
+    message_display('Finish!', 'Score: ' + score)
 
     pygame.display.update()
     time.sleep(2.5)
     game_loop()
 
-def caught(score):
-    score = str(round(score,2))
-
-    gameDisplay.fill(red)
-
-    message_display('You moved on red light', 'and you died and lost', \
-                    'Score: ' + score, text_size='small')
-
-    pygame.display.update()
-    time.sleep(2.5)
-    game_loop()
+# def caught(score):
+#     score = str(round(score,2))
+#
+#     gameDisplay.fill(red)
+#
+#     message_display('You moved on red light', 'and you died and lost', \
+#                     'Score: ' + score, text_size='small')
+#
+#     pygame.display.update()
+#     time.sleep(2.5)
+#     game_loop()
 
 def get_seq(seq):
     global t0
@@ -160,6 +162,8 @@ def game_loop():
                 if event.key == pygame.K_UP:
                     y_change = movement_amt
                     moving = True
+                if event.key == pygame.K_r:
+                    game_loop()
 
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_UP:
@@ -171,16 +175,19 @@ def game_loop():
         if moving:
             if seq == 1:
                 # green score
-                score_change += 0.001
+                score_change = 0.1
             elif seq == 2:
                 # yellow score
-                score_change += 0.01
+                score_change = 0.5
             elif seq == 3:
                 # red score
-                score_change -= 0.2
+                score_change = -0.7
+        # score decay
         elif not moving:
-            # score decay
-            score_change = -0.01
+            if seq == 3:
+                score_change = 0
+            else:
+                score_change = -0.03
 
         # if red when moving you lose
         # if y_change != 0 and seq == 3:
@@ -206,10 +213,10 @@ def game_loop():
         # player
         pygame.draw.rect(gameDisplay, blue, (rect_x,rect_y, rect_width,rect_height))
 
-        display_score(score)
+        display_info(score)
 
         pygame.display.update()
-        clock.tick(40)
+        clock.tick(30)
 
 game_loop()
 pygame.quit()
